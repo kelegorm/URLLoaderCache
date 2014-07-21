@@ -1,3 +1,5 @@
+
+
 package com.kelegorm.urlLoaderCache {
 
 import flash.events.Event;
@@ -12,7 +14,6 @@ import mx.utils.LinkedList;
 import mx.utils.LinkedListNode;
 
 import spark.core.ContentRequest;
-
 import spark.core.IContentLoader;
 
 //--------------------------------------
@@ -36,25 +37,10 @@ import spark.core.IContentLoader;
  *  Provides a caching and queuing image content loader suitable for using
  *  a shared image cache for the BitmapImage and spark Image components.
  */
-public class URLLoaderCache extends EventDispatcher implements IContentLoader
-{
+public class URLLoaderCache extends EventDispatcher implements IContentLoader {
     //--------------------------------------------------------------------------
     //
     //  Constructor
-    //
-    //--------------------------------------------------------------------------
-
-    /**
-     *  Constructor.
-     */
-    public function URLLoaderCache():void
-    {
-        super();
-    }
-
-    //--------------------------------------------------------------------------
-    //
-    //  Class constants
     //
     //--------------------------------------------------------------------------
 
@@ -66,10 +52,22 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
 
     //--------------------------------------------------------------------------
     //
-    //  Variables
+    //  Class constants
     //
     //--------------------------------------------------------------------------
 
+    /**
+     *  Constructor.
+     */
+    public function URLLoaderCache():void {
+        super();
+    }
+
+    //--------------------------------------------------------------------------
+    //
+    //  Variables
+    //
+    //--------------------------------------------------------------------------
     /**
      *  Map of source to CacheEntryNode.
      */
@@ -117,16 +115,14 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
      *
      *  @default true
      */
-    public function get enableCaching():Boolean
-    {
+    public function get enableCaching():Boolean {
         return _enableCaching;
     }
 
     /**
      *  @private
      */
-    public function set enableCaching(value:Boolean):void
-    {
+    public function set enableCaching(value:Boolean):void {
         if (value != _enableCaching)
             _enableCaching = value;
     }
@@ -146,16 +142,14 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
      *
      *  @default false
      */
-    public function get enableQueueing():Boolean
-    {
+    public function get enableQueueing():Boolean {
         return _enableQueueing;
     }
 
     /**
      *  @private
      */
-    public function set enableQueueing(value:Boolean):void
-    {
+    public function set enableQueueing(value:Boolean):void {
         if (value != _enableQueueing)
             _enableQueueing = value;
     }
@@ -167,8 +161,7 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
     /**
      *  Count of active/in-use cache entries.
      */
-    public function get numCacheEntries():int
-    {
+    public function get numCacheEntries():int {
         return cacheEntries.length;
     }
 
@@ -187,16 +180,14 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
      *
      *  @default 2
      */
-    public function get maxActiveRequests():int
-    {
+    public function get maxActiveRequests():int {
         return _maxActiveRequests;
     }
 
     /**
      *  @private
      */
-    public function set maxActiveRequests(value:int):void
-    {
+    public function set maxActiveRequests(value:int):void {
         if (value != _maxActiveRequests)
             _maxActiveRequests = value;
     }
@@ -216,18 +207,15 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
      *
      *  @default 100
      */
-    public function get maxCacheEntries():int
-    {
+    public function get maxCacheEntries():int {
         return _maxCacheEntries;
     }
 
     /**
      *  @private
      */
-    public function set maxCacheEntries(value:int):void
-    {
-        if (value != _maxCacheEntries)
-        {
+    public function set maxCacheEntries(value:int):void {
+        if (value != _maxCacheEntries) {
             _maxCacheEntries = value;
             enforceMaximumCacheEntries();
         }
@@ -242,14 +230,12 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
     /**
      *  @copy spark.core.IContentLoader#load()
      */
-    public function load(source:Object, contentLoaderGrouping:String=null):ContentRequest
-    {
+    public function load(source:Object, contentLoaderGrouping:String = null):ContentRequest {
         var key:Object = source is URLRequest ? URLRequest(source).url : source;
         var cacheEntry:CacheEntryNode = cachedEntryNodes[key];
         var contentRequest:MyContentRequest;
 
-        if (!cacheEntry || cacheEntry.value == UNTRUSTED || !enableCaching)
-        {
+        if (!cacheEntry || cacheEntry.value == UNTRUSTED || !enableCaching) {
             // No previously cached entry or the entry is marked as
             // unshareable (untrusted), we must execute a Loader request
             // for the data.
@@ -268,8 +254,7 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
                     source as URLRequest : new URLRequest(source as String);
 
             // Cache our new LoaderInfo if applicable.
-            if (!cacheEntry && enableCaching)
-            {
+            if (!cacheEntry && enableCaching) {
                 addCacheEntry(key, urlLoader);
 
                 // Mark entry as complete, we'll mark complete later
@@ -282,19 +267,16 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
             // Create MyContentRequest instance to return to caller.
             contentRequest = new MyContentRequest(this, urlLoader);
 
-            if (enableQueueing)
-            {
+            if (enableQueueing) {
                 // Queue load request.
                 queueRequest(urlRequest, urlLoader, contentLoaderGrouping);
             }
-            else
-            {
+            else {
                 // Execute Loader
                 urlLoader.load(urlRequest);
             }
         }
-        else
-        {
+        else {
             // Found a valid cache entry. Create a MyContentRequest instance.
             contentRequest = new MyContentRequest(this, cacheEntry.value,
                     true, cacheEntry.complete);
@@ -315,8 +297,7 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
      *  @return A value being stored by the cache for the provided key. Returns
      *  null if not found or in the likely case the value was stored as null.
      */
-    public function getCacheEntry(source:Object):Object
-    {
+    public function getCacheEntry(source:Object):Object {
         var key:Object = source is URLRequest ? URLRequest(source).url : source;
         var cacheEntry:CacheEntryNode = cachedEntryNodes[key];
         return cacheEntry ? cacheEntry.value : null;
@@ -330,8 +311,7 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
      *  @playerversion AIR 1.5
      *  @productversion Flex 4.5
      */
-    public function removeAllCacheEntries():void
-    {
+    public function removeAllCacheEntries():void {
         cachedEntryNodes = new Dictionary();
         cacheEntries = new LinkedList();
     }
@@ -341,12 +321,10 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
      *
      *  @param source Unique key for value to remove from cache.
      */
-    public function removeCacheEntry(source:Object):void
-    {
+    public function removeCacheEntry(source:Object):void {
         var key:Object = source is URLRequest ? URLRequest(source).url : source;
         var node:CacheEntryNode = cachedEntryNodes[key];
-        if (node)
-        {
+        if (node) {
             cacheEntries.remove(node);
             delete cachedEntryNodes[key];
         }
@@ -358,8 +336,7 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
      *  @param source Unique key to associate provided value with in cache.
      *  @param value Value to cache for given key.
      */
-    public function addCacheEntry(source:Object, value:Object):void
-    {
+    public function addCacheEntry(source:Object, value:Object):void {
         var key:Object = source is URLRequest ? URLRequest(source).url : source;
         var node:CacheEntryNode = cachedEntryNodes[key];
 
@@ -373,23 +350,16 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
     }
 
     /**
-     *  If size of our cache exceeds our maximum, we release the least
-     *  recently used entries necessary to meet our limit.
+     *  Promotes a content grouping to the head of the loading queue.
      *
-     *  @private
+     *  @param contentLoaderGrouping Name of content grouping to promote
+     *  in the loading queue. All queued requests with matching
+     *  contentLoaderGroup will be shifted to the head of the queue.
      */
-    private function enforceMaximumCacheEntries():void
-    {
-        if (_maxCacheEntries <= 0)
-            return;
-
-        while (cacheEntries.length > _maxCacheEntries)
-        {
-            var node:CacheEntryNode = cacheEntries.pop() as CacheEntryNode;
-            var key:Object = (node.key is URLRequest) ?
-                    URLRequest(node.key).url : node.key;
-            delete cachedEntryNodes[key];
-        }
+    public function prioritize(contentLoaderGrouping:String):void {
+        priorityGroup = contentLoaderGrouping;
+        shiftPriority();
+        processQueue();
     }
 
     //--------------------------------------------------------------------------
@@ -399,17 +369,43 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
     //--------------------------------------------------------------------------
 
     /**
-     *  Promotes a content grouping to the head of the loading queue.
-     *
-     *  @param contentLoaderGrouping Name of content grouping to promote
-     *  in the loading queue. All queued requests with matching
-     *  contentLoaderGroup will be shifted to the head of the queue.
+     *  Resets the queue to initial empty state.  All requests, both active
+     *  and queued, are cancelled. All cache entries associated with canceled
+     *  requests are invalidated.
      */
-    public function prioritize(contentLoaderGrouping:String):void
-    {
-        priorityGroup = contentLoaderGrouping;
-        shiftPriority();
-        processQueue();
+    public function removeAllQueueEntries():void {
+        // Cancel any active requests and return to queue.
+        requeueActive(true);
+
+        // Walk queue and invalidate any associated cache entries.
+        if (enableCaching) {
+            var current:QueueEntryNode = requestQueue.head as QueueEntryNode;
+            while (current) {
+                removeCacheEntry(current.urlRequest.url);
+                current = current.next as QueueEntryNode;
+            }
+        }
+
+        // Clear request queue.
+        requestQueue = new LinkedList();
+    }
+
+    /**
+     *  If size of our cache exceeds our maximum, we release the least
+     *  recently used entries necessary to meet our limit.
+     *
+     *  @private
+     */
+    private function enforceMaximumCacheEntries():void {
+        if (_maxCacheEntries <= 0)
+            return;
+
+        while (cacheEntries.length > _maxCacheEntries) {
+            var node:CacheEntryNode = cacheEntries.pop() as CacheEntryNode;
+            var key:Object = (node.key is URLRequest) ?
+                    URLRequest(node.key).url : node.key;
+            delete cachedEntryNodes[key];
+        }
     }
 
     /**
@@ -418,12 +414,10 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
      *
      *  @private
      */
-    private function queueRequest(source:URLRequest, loader:URLLoader, queueGroup:String):void
-    {
+    private function queueRequest(source:URLRequest, loader:URLLoader, queueGroup:String):void {
         var node:QueueEntryNode = new QueueEntryNode(source, loader, queueGroup);
 
-        if (queueGroup == priorityGroup)
-        {
+        if (queueGroup == priorityGroup) {
             // Our new request matches the current priority group, so insert
             // after all currently queued instances of the same priority group.
 
@@ -432,8 +426,7 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
             while (current && current.next && current.queueGroup == priorityGroup)
                 current = current.next as QueueEntryNode;
 
-            if (current)
-            {
+            if (current) {
                 if (current.queueGroup == priorityGroup)
                     requestQueue.insertAfter(node, current);
                 else
@@ -442,8 +435,7 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
             else
                 requestQueue.push(node);
         }
-        else
-        {
+        else {
             // No active priority group, just push to request queue.
             requestQueue.push(node);
         }
@@ -457,13 +449,10 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
      *
      *  @private
      */
-    private function processQueue():void
-    {
-        if (activeRequests.length < maxActiveRequests && requestQueue.length > 0)
-        {
+    private function processQueue():void {
+        if (activeRequests.length < maxActiveRequests && requestQueue.length > 0) {
             var node:QueueEntryNode = requestQueue.shift() as QueueEntryNode;
-            if (node)
-            {
+            if (node) {
                 // Execute load request.
                 var loader:URLLoader = node.value;
                 loader.load(node.urlRequest);
@@ -475,36 +464,10 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
     }
 
     /**
-     *  Resets the queue to initial empty state.  All requests, both active
-     *  and queued, are cancelled. All cache entries associated with canceled
-     *  requests are invalidated.
-     */
-    public function removeAllQueueEntries():void
-    {
-        // Cancel any active requests and return to queue.
-        requeueActive(true);
-
-        // Walk queue and invalidate any associated cache entries.
-        if (enableCaching)
-        {
-            var current:QueueEntryNode = requestQueue.head as QueueEntryNode;
-            while (current)
-            {
-                removeCacheEntry(current.urlRequest.url);
-                current = current.next as QueueEntryNode;
-            }
-        }
-
-        // Clear request queue.
-        requestQueue = new LinkedList();
-    }
-
-    /**
      *  Reorder our request queue giving priorityGroup preference.
      *  @private
      */
-    private function shiftPriority():void
-    {
+    private function shiftPriority():void {
         var current:QueueEntryNode = requestQueue.tail as QueueEntryNode;
         var prioritizedNodes:LinkedList = new LinkedList();
 
@@ -512,20 +475,17 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
         requeueActive();
 
         // Remove all nodes matching current priority queue.
-        while (current)
-        {
+        while (current) {
             var candidate:QueueEntryNode = current;
             current = current.prev as QueueEntryNode;
-            if (candidate.queueGroup == priorityGroup)
-            {
+            if (candidate.queueGroup == priorityGroup) {
                 requestQueue.remove(candidate);
                 prioritizedNodes.push(candidate);
             }
         }
 
         // Reinsert to head of list in original queued order.
-        while (prioritizedNodes.length)
-        {
+        while (prioritizedNodes.length) {
             current = prioritizedNodes.shift() as QueueEntryNode;
             requestQueue.unshift(current);
         }
@@ -540,32 +500,29 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
      *
      *  @private
      */
-    private function requeueActive(requeueAll:Boolean=false):void
-    {
+    private function requeueActive(requeueAll:Boolean = false):void {
         var current:QueueEntryNode = activeRequests.head as QueueEntryNode;
-        while (current)
-        {
+        while (current) {
             var activeNode:QueueEntryNode = current;
             current = current.next as QueueEntryNode;
-            if (activeNode.queueGroup != priorityGroup || requeueAll)
-            {
+            if (activeNode.queueGroup != priorityGroup || requeueAll) {
                 // Remove from active list and invoke close() on the Loader.
                 // We'll reinvoke load() again once the queued request is
                 // serviced.
                 activeRequests.remove(activeNode);
 
-                try
-                {
+                try {
                     URLLoader(activeNode.value).close();
                 }
-                catch (e:Error) {}
-                finally
-                {
+                catch (e:Error) {
+                }
+                finally {
                     requestQueue.unshift(activeNode);
                 }
             }
         }
     }
+
     //--------------------------------------------------------------------------
     //
     //  Event handlers
@@ -580,8 +537,7 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
      *
      *  @private
      */
-    private function loader_completeHandler(e:Event):void
-    {
+    private function loader_completeHandler(e:Event):void {
         var urlLoader:URLLoader = e.target as URLLoader;
 
         // Lookup our cache entry for this loader. We can't lookup by key since
@@ -589,11 +545,9 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
         // example converted to a fully qualified form since our initial request).
         var cachedRequest:CacheEntryNode = cacheEntries.find(urlLoader) as CacheEntryNode;
 
-        if (e.type == Event.COMPLETE && urlLoader)
-        {
+        if (e.type == Event.COMPLETE && urlLoader) {
             // Mark cache entry as complete.
-            if (cachedRequest)
-            {
+            if (cachedRequest) {
                 cachedRequest.complete = true;
 
 //                // Detected that our loader cannot be shared or cached. Mark
@@ -605,8 +559,7 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
 //                }
             }
         }
-        else if (e.type == IOErrorEvent.IO_ERROR || e.type == SecurityErrorEvent.SECURITY_ERROR)
-        {
+        else if (e.type == IOErrorEvent.IO_ERROR || e.type == SecurityErrorEvent.SECURITY_ERROR) {
             // Not suitable for caching.  Lookup our loader info in our cache since
             // the ioError event does not provide us the original url.
             if (cachedRequest)
@@ -616,8 +569,7 @@ public class URLLoaderCache extends EventDispatcher implements IContentLoader
         }
 
         // Remove the related loader from our activeRequests list if applicable.
-        if (activeRequests.length > 0 || requestQueue.length > 0)
-        {
+        if (activeRequests.length > 0 || requestQueue.length > 0) {
             var node:LinkedListNode = activeRequests.remove(urlLoader);
             processQueue();
         }
@@ -647,10 +599,8 @@ import spark.core.IContentLoader;
  *  Represents a single cache entry.
  *  @private
  */
-class CacheEntryNode extends LinkedListNode
-{
-    public function CacheEntryNode(key:Object, value:Object, queueGroup:String=null):void
-    {
+class CacheEntryNode extends LinkedListNode {
+    public function CacheEntryNode(key:Object, value:Object, queueGroup:String = null):void {
         super(value);
         this.key = key;
     }
@@ -680,10 +630,8 @@ class CacheEntryNode extends LinkedListNode
  *  Represents a single queue entry.
  *  @private
  */
-class QueueEntryNode extends LinkedListNode
-{
-    public function QueueEntryNode(urlRequest:URLRequest, loader:URLLoader, queueGroup:String):void
-    {
+class QueueEntryNode extends LinkedListNode {
+    public function QueueEntryNode(urlRequest:URLRequest, loader:URLLoader, queueGroup:String):void {
         super(loader);
         this.urlRequest = urlRequest;
         this.queueGroup = queueGroup;
@@ -710,6 +658,10 @@ class QueueEntryNode extends LinkedListNode
     public var queueGroup:String;
 }
 
+
+/**
+ *  Overriden it for event support: object dispatch events from URLLoader
+ */
 class MyContentRequest extends ContentRequest {
 
     function MyContentRequest(contentLoader:IContentLoader, content:*, shared:Boolean = false, complete:Boolean = false) {
@@ -778,10 +730,8 @@ class MyContentRequest extends ContentRequest {
     /**
      * @private
      */
-    private function content_completeHandler(e:Event):void
-    {
-        if (e.target == _content)
-        {
+    private function content_completeHandler(e:Event):void {
+        if (e.target == _content) {
 //            complete = true;
             dispatchEvent(e);
             removeLoaderListeners();
@@ -791,10 +741,8 @@ class MyContentRequest extends ContentRequest {
     /**
      * @private
      */
-    private function content_ioErrorHandler(e:Event):void
-    {
-        if (e.target == _content)
-        {
+    private function content_ioErrorHandler(e:Event):void {
+        if (e.target == _content) {
             if (hasEventListener(IOErrorEvent.IO_ERROR))
                 dispatchEvent(e);
         }
