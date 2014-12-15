@@ -20,19 +20,19 @@ if (contentRequest.complete) {
 
 #### Hard example
 Here we will consider a class that uses URLLoaderCache to load files.
-To take full example you can take a look at: [https://github.com/kelegorm/AS3SVGRenderer/blob/master/SVGRendererFlex/src/com/lorentz/SVG/Flex/SVG.as]
+To take full example you can take a look at: [https://github.com/kelegorm/AS3SVGRenderer/blob/master/SVGRendererFlex/src/com/lorentz/SVG/Flex/SVG.as] or you can consider Image and BitmapImage spark classes.
 
 ```
 //somewhere
 public static const somethingContent:URLLoaderCahce = new URLLoaderCache();
 
-//Using component
+//using component
 var something:SomethingLoader = new SomethingLoader();
 something.contentLoader = somethingContent;
 something.source = 'my-super-file.any';
 
 
-//Using
+//write loader class
 public class SomethingLoader {
     private var _contentLoader:IContentLoader;
     /**
