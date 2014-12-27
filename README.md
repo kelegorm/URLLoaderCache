@@ -1,6 +1,8 @@
 URLLoaderCache
 ==============
 
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/kelegorm/URLLoaderCache?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 It is a queue and cache with url loader just like 'spark.core.ContentCache' from Flex 4.5
 
 Problem is ContentCache works only with Loader, so you can't use it for text or bin data loading. Loader provide image files only.
